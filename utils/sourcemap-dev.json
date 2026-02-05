@@ -1,0 +1,55 @@
+{
+  "gvars": [
+    {
+      "name": "environment",
+      "file": "src/env.dev.gvar",
+      "id": "9fc90695-5ae7-4450-9e73-c257672b4583"
+    },
+    {
+      "name": "message",
+      "file": "src/gvars/message.gvar",
+      "id": "0b180305-43d3-44cc-893e-4756a1ec6b67"
+    },
+    {
+      "name": "emotes",
+      "file": "src/gvars/emotes.gvar",
+      "id": "4d3bce29-b94a-46f2-bb75-da413a778477"
+    },
+    {
+      "name": "emotes_list",
+      "file": "src/gvars/emotes_list.gvar",
+      "id": "7b17677d-7bdf-4742-bc1f-0bc5c3872677"
+    },
+    {
+      "name": "rolls",
+      "file": "src/gvars/rolls.gvar",
+      "id": "7896d301-f1a5-41f4-bcbc-ea9bcbf58a8e"
+    },
+    {
+      "name": "strings",
+      "file": "src/gvars/strings.gvar",
+      "id": "2c7ecd0c-cd16-42c3-993c-272890132260"
+    }
+  ],
+  "aliases": [
+    {
+      "name": "e",
+      "file": "src/aliases/e.alias",
+      "sub_aliases": [
+        {
+          "name": "random",
+          "file": "src/aliases/e/random.alias"
+        },
+        {
+          "name": "list",
+          "file": "src/aliases/e/list.alias"
+        }
+      ]
+    }
+  ],
+  "snippets": [],
+  "workshop": {
+    "environment": "9fc90695-5ae7-4450-9e73-c257672b4583",
+    "id": "692625378316717c4a511557"
+  }
+}

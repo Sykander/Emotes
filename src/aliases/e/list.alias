@@ -1,0 +1,17 @@
+<drac2>
+using(env="9fc90695-5ae7-4450-9e73-c257672b4583")
+using(
+    message = env.get_gvar_id_by_name("message"),
+    emotes = env.get_gvar_id_by_name("emotes")
+)
+
+args = argparse(&ARGS&)
+emotes_readable_list = ""
+for emote in emotes.emote_list:
+    emotes_readable_list += f"* {emote.name}\n"
+
+return message.get_message(
+    title = "Emotes List",
+    description = emotes_readable_list
+)
+</drac2>

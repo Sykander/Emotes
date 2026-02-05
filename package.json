@@ -1,0 +1,19 @@
+{
+  "name": "emotes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "deploy": "node utils/deploy.js",
+    "lint": "prettier --write ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "publish-avrae": "^1.0.1"
+  },
+  "devDependencies": {
+    "axios": "^1.13.2",
+    "prettier": "^3.6.2"
+  }
+}

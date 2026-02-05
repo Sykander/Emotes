@@ -1,0 +1,215 @@
+# Development
+# 7896d301-f1a5-41f4-bcbc-ea9bcbf58a8e
+# Production
+# 
+
+skills_abilities = {
+    "strength": "strength",
+    "athletics": "strength",
+    "dexterity": "dexterity",
+    "initiative": "dexterity",
+    "acrobatics": "dexterity",
+    "sleightOfHand": "dexterity",
+    "stealth": "dexterity",
+    "constitution": "constitution",
+    "intelligence": "intelligence",
+    "arcana": "intelligence",
+    "history": "intelligence",
+    "investigation": "intelligence",
+    "nature": "intelligence",
+    "religion": "intelligence",
+    "wisdom": "wisdom",
+    "animalHandling": "wisdom",
+    "insight": "wisdom",
+    "medicine": "wisdom",
+    "perception": "wisdom",
+    "survival": "wisdom",
+    "charisma": "charisma",
+    "deception": "charisma",
+    "intimidation": "charisma",
+    "performance": "charisma",
+    "persuasion": "charisma"
+}
+
+save_abilities = {
+    "strength": "strength",
+    "dexterity": "dexterity",
+    "constitution": "constitution",
+    "intelligence": "intelligence",
+    "wisdom": "wisdom",
+    "charisma": "charisma",
+    "death": None,
+    "honor": None,
+    "sanity": None
+}
+
+def get_default_ability_for_skill(skill_name: string):
+    if skill_name in skills_abilities:
+        return skills_abilities[skill_name]
+    
+    return None
+
+def get_default_ability_for_save(save_name: string):
+    if save_name in save_abilities:
+        return save_abilities[save_name]
+    
+    return None
+
+def join_advantage(advantage_a, advantage_b):
+    if advantage_a == None and advantage_b == None:
+        return None
+    elif advantage_a == None:
+        return advantage_b
+    elif advantage_b == None:
+        return advantage_a
+    elif advantage_a != advantage_b:
+        return None
+    else:
+        return advantage_a
+
+def get_d20(adv: bool | None = None):
+    return "1d20" if adv == None else ("2d20kh1" if adv else "2d20kl1")
+
+# Joins a list of roll strings together
+# roll_strings - the list of rolls to join
+# returns a single roll string
+def join_roll_strings(roll_strings: list[str]):
+    if len(roll_strings) == 0:
+        return ""
+
+    result_str = ""
+    for roll_str in roll_strings:
+        if roll_str in [None, ""]:
+            continue
+
+        if result_str != "" and roll_str[0] not in ["+", "-"]:
+            result_str += "+"
+        
+        result_str += roll_str
+
+    return result_str
+
+# Get a roll string for a character using a specific skill
+# character
+# skill_name - the skill to roll for
+# ability_name - the ability to use for the skill roll or None for default
+# bonus - any bonuses to add to the roll
+# adv - true for advantage, false for disadvantage, none for flat
+# returns a single roll string
+def get_skill_check(
+    character,
+    skill_name: str,
+    ability_name: str | None = None,
+    bonuses: list[str] | None = None,
+    adv: bool | None = None
+):
+    if bonuses == None:
+        bonuses = []
+
+    if (character == None):
+        based20 = get_d20(adv)
+        return join_roll_strings([based20] + bonuses)
+
+    skill = None
+    for (b_name, b_skill) in character.skills:
+        if skill_name == b_name:
+            skill = b_skill
+
+    if (skill == None):
+        {}[f"Didn't find skill for {skill_name}!"]
+
+    has_reliable_talent = character_has_reliable_talent(character)
+    has_halfling_luck = character_has_halfing_luck(character)
+
+    mod_override = None
+    if ability_name != None:
+        ability_mod = character.stats.get_mod(ability_name)
+        if (ability_mod == None):
+            {}[f"Didn't find ability mod for {ability_name}!"]
+
+        ability_to_replace = get_default_ability_for_skill(skill_name)
+        if ability_to_replace == None:
+            ability_to_replace_mod = 0
+        else:
+            ability_to_replace_mod = character.stats.get_mod(ability_to_replace)
+
+        mod_override = skill.value + ability_mod - ability_to_replace_mod
+
+    base_adv = join_advantage(adv, skill.adv)
+
+    based20 = skill.d20(
+        base_adv = base_adv,
+        reroll = 1 if has_halfling_luck else None,
+        min_val = 10 if has_reliable_talent else None,
+        mod_override = mod_override
+    )
+    return join_roll_strings([based20] + bonuses)
+
+# Get a roll string for a character using a specific save
+# character
+# save_name - the save to roll for
+# ability_name - the ability to use for the save roll or None for default
+# bonus - any bonuses to add to the roll
+# adv - true for advantage, false for disadvantage, none for flat
+# returns a single roll string
+def get_saving_throw(
+    character,
+    save_name: str,
+    ability_name: str | None = None,
+    bonuses: list[str] | None = None,
+    adv: bool | None = None
+):
+    if bonuses == None:
+        bonuses = []
+
+    if (character == None):
+        based20 = get_d20(adv)
+        return join_roll_strings([based20] + bonuses)
+
+    save = None
+    for (b_save_name, b_save) in character.saves:
+        # Saves have Save at the end of their name
+        if b_save_name.startswith(save_name):
+            save = b_save
+
+    if (save == None):
+        {}[f"Didn't find save for {save_name}!"]
+
+    has_halfling_luck = character_has_halfing_luck(character)
+
+    mod_override = None
+    if ability_name != None:
+        ability_mod = character.stats.get_mod(ability_name)
+        if (ability_mod == None):
+            {}[f"Didn't find ability mod for {ability_name}!"]
+
+        ability_to_replace = get_default_ability_for_save(skill_name)
+
+        if ability_to_replace == None:
+            ability_to_replace_mod = 0
+        else:
+            ability_to_replace_mod = character.stats.get_mod(ability_to_replace)
+
+        mod_override = save.value + ability_mod - ability_to_replace_mod
+
+    base_adv = join_advantage(adv, save.adv)
+
+    based20 = save.d20(
+        base_adv = base_adv,
+        reroll = 1 if has_halfling_luck else None,
+        min_val = None,
+        mod_override = mod_override
+    )
+    return join_roll_strings([based20] + bonuses)
+
+def character_has_halfing_luck(character):
+    if character == None:
+        return False
+
+    return character.race == "Halfling"
+
+def character_has_reliable_talent(character):
+    if character == None:
+        return False
+
+    return character.levels.get("rogue") >= 11

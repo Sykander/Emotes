@@ -1,0 +1,473 @@
+# Development
+# 7b17677d-7bdf-4742-bc1f-0bc5c3872677
+# Production
+# 
+using(env="9fc90695-5ae7-4450-9e73-c257672b4583")
+using(
+    strings = env.get_gvar_id_by_name("strings")
+)
+
+def configure_emote(
+    name: str,
+    keywords: list[str],
+    rolls: list,
+    title: str | function,
+    description: str | function,
+    image: str | function | None = None,
+    thumb: str | function | None = None,
+):
+    return {
+        "name": name,
+        "keywords": keywords,
+        "rolls": rolls,
+        "title": title,
+        "description": description,
+        "image": image,
+        "thumb": thumb
+    }
+
+emote_list = [
+    configure_emote(
+        name = "Dance",
+        keywords = ["dance", "danc", "dnace", "adnce", "dans"],
+        rolls = [{"type": "skill", "name": "performance", "bonuses": ["1d4[style_bonus]"], "dc": 15}],
+        title = lambda character, roll_results, args: f"{character.name} tries to dance!",
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+        """
+    ),
+    configure_emote(
+        name = "Moonwalk",
+        keywords = ["moonwalk", "hee", "heehee", "moon walk"],
+        rolls = [{"type": "skill", "name": "performance", "bonuses": ["1d4[style_bonus]"], "dc": 15}],
+        title = lambda character, roll_results, args: f"""
+            {ctx.author if character == None else character.name} {"moonwalks!" if roll_results[0].total >= 15 else 'tries to moonwalk!'}
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+
+            Hee hee!
+        """,
+        thumb = "https://images-ext-1.discordapp.net/external/W1ylxmr3tOh_6L1v3VwfJMKKFyEZpIkEq0DozepKqlw/https/c.tenor.com/S4fl-fq0nFcAAAAM/michae-jackson-moon-walk.gif?width=275&height=205"
+    ),
+    configure_emote(
+        name = "Rock",
+        keywords = ["eatrock", "rock", "crunch", "orck"],
+        rolls = [{"type": "skill", "name": "survival", "bonuses": [], "dc": 15}],
+        title = lambda character, roll_results, args: f"{character.name} eats a rock!" if roll_results[0].passed else f'{character.name} breaks their teeth on a rock!',
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+
+            {character.name} {"tried to eat" if roll_results[0].passed else "ate"} a rock!
+        """,
+        thumb = "https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyNXVlazF6Yno3MndycWcxdGE1NG9mdGNycDVrazV0d2ltdmZtdWFoNSZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/Wf9dyOrB0nGJn5FIYf/200w.gif"
+    ),
+    configure_emote(
+        name = "Grass",
+        keywords = ["touch", "grass", "grass touch", "gras", "touc"],
+        rolls = [{"type": "skill", "name": "nature", "bonuses": [], "dc": 10}, {"type": "skill", "name": "survival", "bonuses": [], "dc": 10}],
+        title = lambda character, roll_results, args: f'''
+            {character.name} {"doesn't know what grass is!" if not roll_results[0].passed else "goes looking for grass!"}
+        ''',
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full} nature!
+            {roll_results[1].full} survival!
+
+            Does {character.name} touch grass? {"No." if not roll_results[1].passed else "Yes!"}
+        """,
+        thumb = "https://media.tenor.com/hBb-jRuH95gAAAAM/touch-grass-grass.gif"
+    ),
+    configure_emote(
+        name = "Yoink",
+        keywords = ["yoink", "yoin", "yionk"],
+        rolls = [{"type": "skill", "name": "athletics", "bonuses": []}],
+        title = lambda character, roll_results, args: f"""
+            {character.name} yoinks{' ' + strings.get_readable_list(args.get('t')) if len(args.get('t')) > 0 else ''}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+        """,
+        thumb = "https://c.tenor.com/EYiRMotBvX0AAAAd/tenor.gif"
+    ),
+    configure_emote(
+        name = "Resist",
+        keywords = ["resist", "reisst", "reist"],
+        rolls = [{"type": "save", "name": "strength", "bonuses": []}],
+        title = lambda character, roll_results, args: f"{character.name} resists{' ' + strings.get_readable_list(args.get('t')) if len(args.get('t')) > 0 else ''}!",
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+        """
+    ),
+    configure_emote(
+        name = "Rebel",
+        keywords = ["rebel", "rebe", "reebl"],
+        rolls = [{"type": "skill", "name": "strength", "bonuses": []}],
+        title = lambda character, roll_results, args: f"{character.name} rebels{' against ' + strings.get_readable_list(args.get('t')) if len(args.get('t')) > 0 else ''}!",
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+        """
+    ),
+    configure_emote(
+        name = "Spies",
+        keywords = ["spies", "spie", "spi", "spy"],
+        rolls = [{"type": "skill", "name": "stealth", "bonuses": []}, {"type": "skill", "name": "perception", "bonuses": []}],
+        title = lambda character, roll_results, args: f"{character.name} spies{' on ' + strings.get_readable_list(args.get('t')) if len(args.get('t')) > 0 else ''}!",
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full} stealth!
+            {roll_results[1].full} perception!
+        """
+    ),
+    configure_emote(
+        name = "No",
+        keywords = ["no", "no!", "No!", "non", "noo"],
+        rolls = [],
+        title = lambda character, roll_results, args: f"{character.name}",
+        description = lambda character, roll_results, args: f"""
+            "No."
+        """
+    ),
+    configure_emote(
+        name = "Hug",
+        keywords = ["hug", "hug!", "Hug!", "hgu", "hugg"],
+        rolls = [],
+        title = lambda character, roll_results, args: f"{character.name} gives a hug{' to ' + strings.get_readable_list(args.get('t')) if len(args.get('t')) > 0 else ''}!",
+        description = lambda character, roll_results, args: f"""
+            {character.name} is hugging you.
+        """
+    ),
+    configure_emote(
+        name = "Bear Hug",
+        keywords = ["bear hug", "bear hug!", "bearhug", "Bear Hug!", "bear hgu", "ber hug"],
+        rolls = [{"type": "skill", "name": "athletics", "dc": 12}],
+        title = lambda character, roll_results, args: f"{character.name} bear hugs{' ' + strings.get_readable_list(args.get('t')) if len(args.get('t')) > 0 else ''}!",
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+
+            {character.name} is hugging you. {"You feel squished!" if roll_results[0].passed else ""}
+        """
+    ),
+    configure_emote(
+        name = "Yes",
+        keywords = ["yes", "yes!", "Yes!", "yee", "ya"],
+        rolls = [],
+        title = lambda character, roll_results, args: f"{character.name}",
+        description = lambda character, roll_results, args: f"""
+            "Yes."
+        """
+    ),
+    configure_emote(
+        name = "Hello",
+        keywords = ["hello", "hello!", "Hello!", "hi", "helo", "hey"],
+        rolls = [],
+        title = lambda character, roll_results, args: f"{character.name}",
+        description = lambda character, roll_results, args: f"""
+            "Hello." :wave:
+        """
+    ),
+    configure_emote(
+        name = "Dragon",
+        keywords = ["dragon", "dargon", "dracon", "wyvern", "drake"],
+        rolls = [{"type": "skill", "name": "athletics", "ability": "constitution", "bonuses": ["1d4[dragon]"]}],
+        title = lambda character, roll_results, args: f"{character.name} is turning into a dragon!",
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full} dragon check!
+        """
+    ),
+    configure_emote(
+        name = "Blade",
+        keywords = ["blade", "sword", "sowrd", "blaed", "blad", "swor"],
+        rolls = [{"type": "skill", "name": "athletics", "ability": "dexterity", "bonuses": ["1d4[blademaster]"]}],
+        title = lambda character, roll_results, args: f"""
+            {character.name} {'studies the blade!' if args.last('t') == None else f"draws their blade against {strings.get_readable_list( args.get('t') )}!"}
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full} attack roll!
+
+            {"They strike with lethal accuracy!" if roll_results[0].total >= 15 else "They slice through empty air."}
+        """
+    ),
+    configure_emote(
+        name = "Lawyer",
+        keywords = ["lawyer", "laweyr", "lawye", "sue", "law", "lawya", "layw"],
+        rolls = [{"type": "skill", "name": "persuasion", "bonuses": ["1d4[lawyer]"], "adv": True }],
+        title = lambda character, roll_results, args: f"""
+            {character.name} lawyers up!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full} lawyer check!
+
+            {"Saul shows up to defend the client!" if roll_results[0].total >= 15 else "They get an overworked public defense attorney."}
+        """
+    ),
+    configure_emote(
+        name = "Walk",
+        keywords = ["walk", "wakl", "leave", "walking", "walks"],
+        rolls = [],
+        title = lambda character, roll_results, args: f"""
+            {character.name} walks away{'' if args.last('t') == None else f" from {strings.get_readable_list( args.get('t') )}"}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            They turn and leave.
+        """
+    ),
+    configure_emote(
+        name = "Flex",
+        keywords = ["flex", "flex!", "felx", "fexl", "elfx"],
+        rolls = [{"type": "skill", "name": "performance", "ability": "strength", "bonuses": [], "adv": True }],
+        title = lambda character, roll_results, args: f"""
+            {character.name} flexes{'' if args.last('t') == None else f" on {strings.get_readable_list( args.get('t') )}"}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+        """,
+        thumb = "https://media.tenor.com/v_qPOJw06Q0AAAAM/flexing-flex.gif"
+    ),
+    configure_emote(
+        name = "Tackle",
+        keywords = ["tackle", "tackle!", "Tackle", "tackl", "tackel"],
+        rolls = [{"type": "skill", "name": "dexterity", "bonuses": [] }],
+        title = lambda character, roll_results, args: f"""
+            {character.name} tackles{'' if args.last('t') == None else f" {strings.get_readable_list( args.get('t') )}"}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+        """
+    ),
+    configure_emote(
+        name = "Drink",
+        keywords = ["drink", "drink!", "Drink", "dirnk", "drin"],
+        rolls = [{"type": "save", "name": "constitution", "bonuses": [], "dc": 10 }],
+        title = lambda character, roll_results, args: f"""
+            {character.name} takes a drink{'' if args.last('t') == None else f" with {strings.get_readable_list( args.get('t') )}"}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+
+            {f'{character.name} sips their drink.' if roll_results[0].passed else f"{character.name} can't handle their drink." }
+        """
+    ),
+    configure_emote(
+        name = "Minecraft",
+        keywords = ["mine", "mine!", "Mine", "mien", "minecraft"],
+        rolls = [{"type": "skill", "name": "athletics", "ability": "constitution", "bonuses": ["1d4[Efficiency_V]"], "dc": 10 }],
+        title = lambda character, roll_results, args: f"""
+            {character.name} goes mining{'' if args.last('t') == None else f" with {strings.get_readable_list( args.get('t') )}"}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+
+            {f'{character.name} found an iron ore vein!' if not roll_results[0].passed else f'{character.name} found diamonds!' }
+        """,
+        thumb = "https://media.tenor.com/SZbXUb9vjCsAAAAM/mining-minecraft-said65446666.gif"
+    ),
+    configure_emote(
+        name = "Do it!",
+        keywords = ["doit", "doit!", "Doit", "do it", "Do it", "darkside"],
+        rolls = [],
+        title = lambda character, roll_results, args: f"""
+            {character.name}
+        """,
+        description = lambda character, roll_results, args: f"""
+            "Do it."
+        """,
+        thumb = "https://c.tenor.com/wPwsT9YWDfQAAAAC/tenor.gif"
+    ),
+    configure_emote(
+        name = "Sleepy",
+        keywords = ["sleepy", "sleepi", "tired", "yawn", "ywan", "tire"],
+        rolls = [{ "type": "save", "name": "constitution", "dc": 10 }],
+        title = lambda character, roll_results, args: f"""
+            {character.name} is feeling tired.
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full} sleepy save!
+
+            { f"They yawn loudly!" if not roll_results[0].passed else f"They try to keep their eyes open."}
+        """,
+        thumb = "https://media.tenor.com/l7j4o_6VpCwAAAAM/cats-urik3852.gif"
+    ),
+    configure_emote(
+        name = "Bed",
+        keywords = ["sleeping", "sleeping", "bed", "Bed", "sleping"],
+        rolls = [],
+        title = lambda character, roll_results, args: f"""
+            {character.name} goes to bed!
+        """,
+        description = lambda character, roll_results, args: f"""
+            zzz
+        """,
+        thumb = "https://media.tenor.com/HErW9lJMDaEAAAAM/cat-asleep-monjjunirawr.gif"
+    ),
+    configure_emote(
+        name = "Backflip",
+        keywords = ["flip", "flip!", "Flip", "backflip", "Backflip"],
+        rolls = [{"type": "skill", "name": "acrobatics", "dc": 12 }],
+        title = lambda character, roll_results, args: f"""
+            {f'{character.name} tries to backflip' if not roll_results[0].passed else f'{character.name} does a backflip' }{'' if args.last('t') == None else f" over {strings.get_readable_list( args.get('t') )}"}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+
+            {f"{character.name} doesn't stick the landing." if not roll_results[0].passed else f'{character.name} sticks the landing!' }
+        """,
+        thumb = "https://media.tenor.com/EanA5KK2yfYAAAAM/backflip-happy.gif"
+    ),
+    configure_emote(
+        name = "You underestimate my power",
+        keywords = ["underestimate", "underestimate!", "anakin", "Underestimate"],
+        rolls = [],
+        title = lambda character, roll_results, args: f"""
+            {character.name}
+        """,
+        description = lambda character, roll_results, args: f"""
+            "You underestimate my power."
+        """,
+        thumb = "https://media.tenor.com/LTNgrYRog2cAAAAM/star-wars-anakin-skywalker.gif"
+    ),
+    configure_emote(
+        name = "Unlimited Power",
+        keywords = ["unlimitedpower", "unlimitedpower!", "sidious", "lightning"],
+        rolls = [],
+        title = lambda character, roll_results, args: f"""
+            {character.name}
+        """,
+        description = lambda character, roll_results, args: f"""
+            **"Unlimited power!"**
+        """,
+        thumb = "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZXpuOXRiaHZubWQwZ2R1cXBvaDJpZDk4ZmRhdXk5dmF3bm9zdHB3MCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/hokMyu1PAKfJK/giphy.gif"
+    ),
+    configure_emote(
+        name = "Facepalm",
+        keywords = ["facepalm", "palm", "bruh"],
+        rolls = [],
+        title = lambda character, roll_results, args: f"""
+            {character.name} facepalms.
+        """,
+        description = lambda character, roll_results, args: f"""
+            This could have been avoided.
+        """
+    ),
+    configure_emote(
+        name = "Disguise",
+        keywords = ["disguise", "mask", "incognito"],
+        rolls = [{"type": "skill", "name": "deception", "dc": 13}],
+        title = lambda character, roll_results, args: f"""
+            {character.name} attempts to disguise themselves.
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+
+            {"They blend in perfectly." if roll_results[0].passed else "Something feels off."}
+        """
+    ),
+    configure_emote(
+        name = "Pickpocket",
+        keywords = ["pickpocket", "steal", "thief", "yoinkcoin"],
+        rolls = [{"type": "skill", "name": "sleightOfHand", "dc": 13}],
+        title = lambda character, roll_results, args: f"""
+            {character.name} attempts to pickpocket{'' if args.last('t') == None else f" {strings.get_readable_list(args.get('t'))}"}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+
+            {"They get away clean." if roll_results[0].passed else "They are immediately noticed."}
+        """
+    ),
+    configure_emote(
+        name = "Intimidate",
+        keywords = ["intimidate", "intim", "scare", "threaten"],
+        rolls = [{"type": "skill", "name": "intimidation", "bonuses": [], "dc": 14}],
+        title = lambda character, roll_results, args: f"""
+            {character.name} tries to intimidate{'' if args.last('t') == None else f" {strings.get_readable_list(args.get('t'))}"}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+
+            {"They back down." if roll_results[0].passed else "They are not impressed."}
+        """
+    ),
+    configure_emote(
+        name = "Sneer",
+        keywords = ["sneer", "smirk", "mock"],
+        rolls = [],
+        title = lambda character, roll_results, args: f"""
+            {character.name} sneers{'' if args.last('t') == None else f" at {strings.get_readable_list(args.get('t'))}"}.
+        """,
+        description = lambda character, roll_results, args: f"""
+            The disrespect is palpable.
+        """
+    ),
+    configure_emote(
+        name = "Tantrum",
+        keywords = ["tantrum", "tantruming", "tantrums", "meltdown", "rage", "hissyfit"],
+        rolls = [{"type": "save", "name": "wisdom", "dc": 12}],
+        title = lambda character, roll_results, args: f"""
+            {character.name} throws a tantrum!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+
+            {"They calm themselves down." if roll_results[0].passed else "They flail, stomp, and scream incoherently."}
+        """
+    ),
+    configure_emote(
+        name = "Suplex",
+        keywords = ["german suplex", "German Suplex", "sulpex", "spulex", "psulex", "suple"],
+        rolls = [{"type": "skill", "name": "athletics", "dc": 12}],
+        title = lambda character, roll_results, args: f"""
+            {character.name} suplexes {'the air' if args.last('t') == None else f"{strings.get_readable_list(args.get('t'))}"}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+        """,
+        thumb = "https://media.tenor.com/PauCpdVkPjAAAAAM/anime-golds-anime.gif"
+    ),
+    configure_emote(
+        name = "Eradicate",
+        keywords = ["eradicate", "eviscerate", "kamehameha", "destroyed", "disintegrated"],
+        rolls = [{"type": "skill", "name": "arcana", "dc": 18}],
+        title = lambda character, roll_results, args: f"""
+            {character.name} eradicates {'the air' if args.last('t') == None else f"{strings.get_readable_list(args.get('t'))}"}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}!
+
+            {"Eradicated down to the last atom!" if roll_results[0].passed else "They're not looking too good."}
+        """,
+        thumb = "https://media.tenor.com/-pU0r1kYtvQAAAAM/kamehameha-goku.gif"
+    ),
+    configure_emote(
+        name = "Melt",
+        keywords = ["melt", "Melt", "melt!", "Melt!", "mlet"],
+        rolls = [],
+        title = lambda character, roll_results, args: f"""
+            {character.name} melts into a puddle!
+        """,
+        description = lambda character, roll_results, args: f"""
+        """,
+        thumb = "https://media.tenor.com/BOjPGZQVUyMAAAAM/kolanko22.gif"
+    ),
+    configure_emote(
+        name = "Dap",
+        keywords = ["dap", "dab", "Dap", "Dab", "Dap!", "Dab!"],
+        rolls = [],
+        title = lambda character, roll_results, args: f"""
+            {character.name} offer their hand for a dap{'' if args.last('t') == None else f" to {strings.get_readable_list(args.get('t'))}"}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            "Dap me up!"
+        """,
+        thumb = "https://c.tenor.com/qJDW3U-f62UAAAAd/tenor.gif"
+    ),
+    configure_emote(
+        name = "Boops",
+        keywords = ["boop", "boop!", "Boop", "Boop!"],
+        rolls = [{"type": "skill", "name": "dexterity"}],
+        title = lambda character, roll_results, args: f"""
+            {character.name} boops{' everyone' if args.last('t') == None else f" {strings.get_readable_list(args.get('t'))}"}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full} Boop Roll!
+        """
+    )
+]

@@ -1,0 +1,121 @@
+# Development
+# 4d3bce29-b94a-46f2-bb75-da413a778477
+# Production
+# 
+using(env="9fc90695-5ae7-4450-9e73-c257672b4583")
+using(
+    rolls = env.get_gvar_id_by_name("rolls"),
+    emotes_list = env.get_gvar_id_by_name("emotes_list")
+)
+
+emote_list = emotes_list.emote_list
+
+def get_emote_by_slug(emote_slug):
+    for emote in emote_list:
+        if emote.name == emote_slug:
+            return emote
+
+    # No exact match so now we search for nearest match
+    for emote in emote_list:
+        if emote_slug in emote.keywords:
+            return emote
+
+    # If the provided pattern is too short we don't do partial matching
+    if len(emote_slug) < 3:
+        return None
+
+    for emote in emote_list:
+        if emote.name.lower().startswith(emote_slug.lower()):
+            return emote
+
+    return None
+
+def get_random_emote():
+    randindex = randint(0, len(emote_list))
+    return emote_list[randindex]
+
+def use_emote(character, emote, args):
+    # First determine what the user rolled
+    argbonuses = args.get("b")
+    argadvantage = args.adv(boolwise = True)
+    argattackadvantage = args.adv(eadv = True)
+    skillbonuses = []
+    savebonuses = []
+    attackbonuses = []
+
+    if args.last("guidance") != None:
+        skillbonuses.append("1d4[guidance]")
+
+    if args.last("bless") != None:
+        savebonuses.append("1d4[bless]")
+        attackbonuses.append("1d4[bless]")
+
+    roll_results = []
+    for e_roll in emote.rolls:
+        if e_roll.type == "skill":
+            roll_str = rolls.get_skill_check(
+                character = character,
+                skill_name = e_roll.name,
+                adv = rolls.join_advantage(argadvantage, e_roll.adv if "adv" in e_roll else None),
+                ability_name = e_roll.ability if "ability" in e_roll else None,
+                bonuses = argbonuses + skillbonuses + (e_roll.bonuses if "bonuses" in e_roll else [])
+            )
+        elif e_roll.type == "save":
+            roll_str = rolls.get_saving_throw(
+                character = character,
+                save_name = e_roll.name,
+                adv = rolls.join_advantage(argadvantage, e_roll.adv if "adv" in e_roll else None),
+                ability_name = e_roll.ability if "ability" in e_roll else None,
+                bonuses = argbonuses + savebonuses + (e_roll.bonuses if "bonuses" in e_roll else [])
+            )
+        elif e_roll.type == "attack":
+            {}[f"Unimplemented attack type rolls."]
+        else:
+            {}[f"Didn't find roll engine for {e_roll.type}! Should be save, skill, or attack."]
+
+        roll_result = vroll(roll_str)
+        if "dc" in e_roll:
+            passed = roll_result.total >= e_roll.dc
+            dc = e_roll.dc
+        else:
+            passed = None
+            dc = None
+
+        roll_results.append({
+            "passed": passed,
+            "dc": dc,
+            "total": roll_result.total,
+            "full": roll_result.full,
+            "result": roll_result
+        })
+
+    if emote.title == str(emote.title):
+        title_str = emote.title
+    else:
+        title_str = emote.title(character, roll_results, args)
+
+    if emote.description == str(emote.description):
+        description_str = emote.description
+    else:
+        description_str = emote.description(character, roll_results, args)
+
+    if emote.image == None:
+        image_str = None
+    elif emote.image == str(emote.image):
+        image_str = emote.image
+    else:
+        image_str = emote.image(character, roll_results, args)
+
+    if emote.thumb == None:
+        thumb_str = None
+    elif emote.thumb == str(emote.thumb):
+        thumb_str = emote.thumb
+    else:
+        thumb_str = emote.thumb(character, roll_results, args)
+
+    return {
+        "title": title_str,
+        "description": description_str,
+        "image": image_str,
+        "thumb": thumb_str
+    }

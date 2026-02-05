@@ -1,0 +1,15 @@
+# Development
+# 2c7ecd0c-cd16-42c3-993c-272890132260
+# Production
+# 
+
+# Takes a list of strings and returns a single human readable string listing the items
+# items - string list
+# returns readable string
+def get_readable_list(items: list[str]) -> str:
+    if len(items) == 1:
+        items_str = items[0]
+    else:
+        items_str = " and ".join([", ".join(items[:-1]), items[-1]])
+
+    return items_str

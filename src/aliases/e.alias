@@ -1,0 +1,30 @@
+<drac2>
+using(env="9fc90695-5ae7-4450-9e73-c257672b4583")
+using(
+    message = env.get_gvar_id_by_name("message"),
+    emotes = env.get_gvar_id_by_name("emotes"),
+    rolls = env.get_gvar_id_by_name("rolls")
+)
+
+args = argparse(&ARGS&)
+emote_slug = args.last("emote", &ARGS&[0])
+
+ch = character()
+emote = emotes.get_emote_by_slug(emote_slug)
+if emote != None:
+    emote_result = emotes.use_emote(character = ch, emote = emote, args = args)
+    return message.get_message(
+        title = emote_result.title,
+        description = emote_result.description,
+        image = emote_result.image,
+        thumb = emote_result.thumb if emote_result.thumb else ch.image
+    )
+
+emote_roll = vroll("1d20")
+title = f'{ch.name} tries to {emote_slug}!'
+desc = f'''
+    You {emote_slug} for {emote_roll.full}!
+'''
+
+return message.get_message(description = desc, title = title)
+</drac2>

@@ -1,0 +1,31 @@
+{
+  "gvars": [
+    {
+      "name": "environment",
+      "file": "src/env.dev.gvar",
+      "id": ""
+    },
+    {
+      "name": "get_message",
+      "file": "src/gvars/get_message.gvar",
+      "id": ""
+    }
+  ],
+  "aliases": [
+    {
+      "name": "e",
+      "file": "src/aliases/e.alias",
+      "sub_aliases": [
+        {
+          "name": "dance",
+          "file": "src/aliases/e/dance.alias"
+        }
+      ]
+    }
+  ],
+  "snippets": [],
+  "workshop": {
+    "environment": "",
+    "id": ""
+  }
+}
