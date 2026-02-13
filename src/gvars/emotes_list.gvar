@@ -495,5 +495,18 @@ emote_list = [
 
             {character.name} {"is very proud!" if roll_results[0].passed else "is slightly impressed."}
         """
+    ),
+    configure_emote(
+        name = "Vibe",
+        keywords = ["vibe", "Vibe", "vieb", "Vieb", "Vibe!", "vibe!"],
+        rolls = [{"type": "skill", "name": "charisma", "dc": 10}],
+        title = lambda character, roll_results, args: f"""
+            {character.name} is vibing{'' if args.last('t') == None else f" with {strings.get_readable_list(args.get('t'))}"}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}
+
+            {"Big vibes!" if roll_results[0].passed else "Feeling okay I guess."}
+        """
     )
 ]
