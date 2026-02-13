@@ -469,5 +469,31 @@ emote_list = [
         description = lambda character, roll_results, args: f"""
             {roll_results[0].full} Boop Roll!
         """
+    ),
+    configure_emote(
+        name = "Happy",
+        keywords = ["happy", "Happy", "hapi", "Hapi", "Happy!", "happy!"],
+        rolls = [{"type": "skill", "name": "wisdom", "dc": 10}],
+        title = lambda character, roll_results, args: f"""
+            {character.name} is feeling happy{'' if args.last('t') == None else f" with {strings.get_readable_list(args.get('t'))}"}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}
+
+            {character.name} {"is feeling good!" if roll_results[0].passed else "could feel better."}
+        """
+    ),
+    configure_emote(
+        name = "Proud",
+        keywords = ["proud", "Proud", "pruod", "Pruod", "Proud!", "proud!"],
+        rolls = [{"type": "skill", "name": "wisdom", "dc": 10}],
+        title = lambda character, roll_results, args: f"""
+            {character.name} feels proud{'' if args.last('t') == None else f" of {strings.get_readable_list(args.get('t'))}"}!
+        """,
+        description = lambda character, roll_results, args: f"""
+            {roll_results[0].full}
+
+            {character.name} {"is very proud!" if roll_results[0].passed else "is slightly impressed."}
+        """
     )
 ]

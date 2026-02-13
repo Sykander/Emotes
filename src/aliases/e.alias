@@ -26,5 +26,9 @@ desc = f'''
     You {emote_slug} for {emote_roll.full}!
 '''
 
-return message.get_message(description = desc, title = title)
+return message.get_message(
+    description = desc,
+    title = title,
+    thumb = image
+)
 </drac2>
