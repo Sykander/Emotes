@@ -31,7 +31,7 @@ emote_list = [
         name = "Dance",
         keywords = ["dance", "danc", "dnace", "adnce", "dans"],
         rolls = [{"type": "skill", "name": "performance", "bonuses": ["1d4[style_bonus]"], "dc": 15}],
-        title = lambda character, roll_results, args: f"{character.name} tries to dance!" ir roll_results[0].passed else f"{character.name} is dancing!",
+        title = lambda character, roll_results, args: f"{character.name} tries to dance!" if roll_results[0].passed else f"{character.name} is dancing!",
         description = lambda character, roll_results, args: f"""
             {roll_results[0].full}!
         """,
