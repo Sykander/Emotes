@@ -59,7 +59,7 @@ emote_list = [
         description = lambda character, roll_results, args: f"""
             {roll_results[0].full}!
 
-            {character.name} {"tried to eat" if roll_results[0].passed else "ate"} a rock!
+            {character.name} {"tried to eat" if not roll_results[0].passed else "ate"} a rock!
         """,
         thumb = "https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyNXVlazF6Yno3MndycWcxdGE1NG9mdGNycDVrazV0d2ltdmZtdWFoNSZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/Wf9dyOrB0nGJn5FIYf/200w.gif"
     ),
