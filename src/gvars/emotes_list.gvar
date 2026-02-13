@@ -31,10 +31,11 @@ emote_list = [
         name = "Dance",
         keywords = ["dance", "danc", "dnace", "adnce", "dans"],
         rolls = [{"type": "skill", "name": "performance", "bonuses": ["1d4[style_bonus]"], "dc": 15}],
-        title = lambda character, roll_results, args: f"{character.name} tries to dance!",
+        title = lambda character, roll_results, args: f"{character.name} tries to dance!" ir roll_results[0].passed else f"{character.name} is dancing!",
         description = lambda character, roll_results, args: f"""
             {roll_results[0].full}!
-        """
+        """,
+        thumb = "https://media.tenor.com/ZMQeC9TLZikAAAAM/souls.gif"
     ),
     configure_emote(
         name = "Moonwalk",
@@ -499,7 +500,7 @@ emote_list = [
     configure_emote(
         name = "Vibe",
         keywords = ["vibe", "Vibe", "vieb", "Vieb", "Vibe!", "vibe!"],
-        rolls = [{"type": "skill", "name": "charisma", "dc": 10}],
+        rolls = [{"type": "skill", "name": "charisma", "dc": 10, "bonuses": ["1d4[good_vibes]"]}],
         title = lambda character, roll_results, args: f"""
             {character.name} is vibing{'' if args.last('t') == None else f" with {strings.get_readable_list(args.get('t'))}"}!
         """,
